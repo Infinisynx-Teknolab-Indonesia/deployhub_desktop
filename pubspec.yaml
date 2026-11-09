@@ -1,0 +1,66 @@
+name: deployhub
+description: DeployHub — CI/CD desktop untuk build & deploy aplikasi Flutter ke Google Play dan App Store (TestFlight).
+publish_to: 'none'
+version: 1.25.0+57
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  path: ^1.9.0
+  path_provider: ^2.1.4
+  file_picker: ^8.1.2
+  flutter_secure_storage: ^9.2.2
+  url_launcher: ^6.3.0
+  googleapis: ^13.2.0
+  googleapis_auth: ^1.6.0
+  # dartssh2 <2.15 gagal dikompilasi di Dart terbaru (sftp_client.dart: int? -> num).
+  # 4.x butuh pointycastle 4, jadi dart_jsonwebtoken ikut naik ke 3.x.
+  dartssh2: ^4.1.0
+  window_manager: ^0.4.3     # full screen + title bar sendiri (sama seperti Arsip PU)
+  tray_manager: ^0.5.2       # ikon di system tray
+  dart_jsonwebtoken: ^3.4.1  # token App Store Connect API (ES256 dari file .p8)
+  image: ^4.3.0               # optimasi gambar bitmap (Laporan AAB → Optimalkan)
+
+# Sama seperti Arsip PU / Batam ChitChat: path_provider_android >=2.3 menarik
+# package:jni yang gagal dikompilasi saat build Windows. Aman walau tidak terpakai.
+dependency_overrides:
+  path_provider_android: 2.2.17
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/app_icon.ico
+    - assets/icons/tray_icon_mac.png
+  # Huruf sama dengan Arsip Dokumen PU (lisensi OFL, lihat assets/fonts/OFL-*.txt)
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+        - asset: assets/fonts/PlusJakartaSans-Italic.ttf
+          style: italic
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800
