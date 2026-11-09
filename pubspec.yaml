@@ -1,7 +1,7 @@
 name: deployhub
 description: DeployHub — CI/CD desktop untuk build & deploy aplikasi Flutter ke Google Play dan App Store (TestFlight).
 publish_to: 'none'
-version: 1.25.0+57
+version: 1.26.0+58
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

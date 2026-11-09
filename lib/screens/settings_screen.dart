@@ -752,7 +752,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(appName, style: YmTextStyles.headline),
-                  Text(tr('Versi {0}', ['1.25.0']), style: YmTextStyles.label.copyWith(fontSize: 12.5)),
+                  Text(tr('Versi {0}', ['1.26.0']), style: YmTextStyles.label.copyWith(fontSize: 12.5)),
                   const SizedBox(height: 6),
                   Text(
                     tr('CI/CD desktop untuk aplikasi Flutter: build, cek kelayakan rilis, upload ke Google Play & TestFlight, sinkron listing, dan GitHub dalam satu aplikasi.'),
