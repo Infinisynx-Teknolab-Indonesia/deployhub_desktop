@@ -2,6 +2,7 @@
 // Missing keys fall back to Indonesian.
 
 const kEn = <String, String>{
+  '{0} file cadangan *.deployhub.bak dipindahkan ke .deployhub_backup/ (agar build tidak gagal)': '{0} *.deployhub.bak backup files moved to .deployhub_backup/ (so the build does not fail)',
   'Log kosong di server.': 'Log is empty on the server.',
   'Log server tidak bisa diambil: {0}': 'Could not fetch the server log: {0}',
   'langsung ke Production (rollout bertahap)': 'straight to Production (staged rollout)',

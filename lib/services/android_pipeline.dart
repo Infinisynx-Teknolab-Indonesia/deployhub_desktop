@@ -12,6 +12,7 @@ import 'gradle_fixer.dart';
 import 'integrations.dart';
 import 'ai_fixer.dart';
 import 'osv_scan.dart';
+import 'aab_optimizer.dart' show cleanStrayBackups;
 import 'security_scan.dart';
 import 'project_doctor.dart';
 import 'keystore_tool.dart';
@@ -393,6 +394,9 @@ List<PipelineStep> androidSteps(Project pr, AndroidOptions o, AppSettings settin
         if (o.mode == 'production' && !extra.any((a) => a.startsWith('--split-debug-info')))
           '--split-debug-info=build/symbols/${r.version.replaceAll('+', '-')}',
       ];
+      // Sisa cadangan *.deployhub.bak di res/ atau assets/ merusak build Android → pindahkan dulu
+      final moved = await cleanStrayBackups(root);
+      if (moved > 0) r.log('🧹 ${trL('{0} file cadangan *.deployhub.bak dipindahkan ke .deployhub_backup/ (agar build tidak gagal)', ['$moved'])}');
       // Perbaikan Gradle otomatis (import Kotlin DSL, applicationId, google-services.json)
       final gf = await fixGradle(root, packageName: pr.packageName);
       for (final m in gf.fixed) {

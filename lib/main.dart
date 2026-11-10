@@ -395,7 +395,7 @@ class _Sidebar extends StatelessWidget {
               _SideItem(icon: Icons.settings_outlined, label: tr('Pengaturan'), active: active == 'settings', onTap: () => nav.value = 'settings'),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Text('$appName v1.25', style: YmTextStyles.labelSm.copyWith(color: YmColors.outline)),
+                child: Text('$appName v1.26', style: YmTextStyles.labelSm.copyWith(color: YmColors.outline)),
               ),
             ]),
           ),

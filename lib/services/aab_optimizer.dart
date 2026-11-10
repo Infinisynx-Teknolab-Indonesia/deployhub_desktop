@@ -67,9 +67,38 @@ Future<OptimizeResult> runAabAction(AabAction a, AabReport r, String root, {Stri
   return res;
 }
 
-Future<void> _backup(File f) async {
-  final b = File('${f.path}.deployhub.bak');
-  if (!await b.exists()) await f.copy(b.path);
+/// Cadangan disimpan DI LUAR res/ dan assets/ → <project>/.deployhub_backup/<path relatif>.bak
+/// (file *.bak di dalam android/app/src/main/res membuat build gagal:
+///  "The file name must end with .xml or .png").
+Future<void> _backup(File f, String root) async {
+  final b = File(p.join(root, '.deployhub_backup', '${p.relative(f.path, from: root)}.bak'));
+  if (await b.exists()) return;
+  await b.parent.create(recursive: true);
+  await f.copy(b.path);
+}
+
+/// Pindahkan sisa *.deployhub.bak versi lama dari android/app/src & assets ke .deployhub_backup/.
+/// Mengembalikan jumlah file yang dipindahkan.
+Future<int> cleanStrayBackups(String root) async {
+  var n = 0;
+  for (final dir in ['android/app/src', 'assets']) {
+    final d = Directory(p.join(root, dir));
+    if (!await d.exists()) continue;
+    final found = <File>[];
+    await for (final e in d.list(recursive: true, followLinks: false)) {
+      if (e is File && e.path.endsWith('.deployhub.bak')) found.add(e);
+    }
+    for (final e in found) {
+      final dest = File(p.join(root, '.deployhub_backup', p.relative(e.path, from: root)));
+      try {
+        await dest.parent.create(recursive: true);
+        await e.copy(dest.path);
+        await e.delete();
+        n++;
+      } catch (_) {}
+    }
+  }
+  return n;
 }
 
 // ───────────────────────── Edge-to-edge (Android 15+)
@@ -123,7 +152,7 @@ Future<void> _edgeToEdge(String root, String pkg, OptimizeResult res) async {
     }
   }
   if (c != orig) {
-    await _backup(main);
+    await _backup(main, root);
     await main.writeAsString(c);
     res.changes.add('${p.basename(main.path)}: FlutterFragmentActivity + enableEdgeToEdge() sebelum super.onCreate');
   }
@@ -140,7 +169,7 @@ Future<void> _edgeToEdge(String root, String pkg, OptimizeResult res) async {
     } else {
       t = '${t.trimRight()}\n\ndependencies {\n$dep\n}\n';
     }
-    await _backup(g);
+    await _backup(g, root);
     await g.writeAsString(t);
     res.changes.add('$name: + androidx.activity:activity-ktx (enableEdgeToEdge)');
     break;
@@ -189,12 +218,12 @@ Future<void> _images(String root, List<String> large, OptimizeResult res) async 
       res.notes.add('${p.basename(f.path)}: sudah optimal (${before ~/ 1024} KB)');
       continue;
     }
-    await _backup(f);
+    await _backup(f, root);
     await f.writeAsBytes(bytes);
     res.changes.add('${p.relative(f.path, from: root)}: ${before ~/ 1024} KB → ${bytes.length ~/ 1024} KB'
         '${out.width != im.width ? ' (${im.width}px → ${out.width}px)' : ''}');
   }
-  res.notes.add('Nama file tetap sama, jadi kode & pubspec tidak perlu diubah. File asli disimpan di *.deployhub.bak.');
+  res.notes.add('Nama file tetap sama, jadi kode & pubspec tidak perlu diubah. File asli disimpan di folder .deployhub_backup/ (di luar res/ dan assets/).');
 }
 
 // ───────────────────────── simbol debug native
@@ -218,7 +247,7 @@ Future<void> _ndkSymbols(String root, OptimizeResult res) async {
     }
     final at = bt + m.end;
     t = '${t.substring(0, at)}$line\n${t.substring(at)}';
-    await _backup(g);
+    await _backup(g, root);
     await g.writeAsString(t);
     res.changes.add('$name: buildTypes.release + ndk { debugSymbolLevel = SYMBOL_TABLE }');
     return;
